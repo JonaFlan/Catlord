@@ -99,9 +99,32 @@ class Bala(pg.sprite.Sprite):
         def update(self):
                 self.rect[0] += self.vel_x
                 self.rect[1] += self.vel_y
+                if self.rect.bottom < 0 or self.rect.top > alto or self.rect.right < 0 or self.rect.left > ancho:
+                        self.kill()
+
+class Enemigo(pg.sprite.Sprite):
+        def __init__(self):
+                #ATRIBUTOS BÁSICOS
+                super().__init__()
+                self.image = pg.image.load("caraJunior.png")
+                self.rect = self.image.get_rect()
+                self.rect.centerx = ancho - self.rect[0]
+                self.rect.centery = alto//2
+                self.vel_x = 2
+                self.vel_y = 2
+        def update(self, x, y):
+                if x < self.rect.centerx:
+                        self.rect[0] -= self.vel_x
+                if x > self.rect.centerx:
+                        self.rect[0] += self.vel_x
+                if y < self.rect.centery:
+                        self.rect[1] -= self.vel_y
+                if y > self.rect.centery:
+                        self.rect[1] += self.vel_y
 
 #GRUPOS DE SPIRITES
 totalSprites = pg.sprite.Group()
+enemigos = pg.sprite.Group()
 balas = pg.sprite.Group()
 
 #CONFIGURACIÓN BÁSICA DE LA VENTANA
@@ -110,9 +133,13 @@ tamañoVentana = ancho, alto = 1920, 1080
 pantalla = pg.display.set_mode(tamañoVentana)
 negro = 0,0,0
 blanco = 255,255,255
+
 jugador = Jugador()
+enemigo = Enemigo()
 totalSprites.add(jugador)
-pg.display.set_icon(jugador.image)
+enemigos.add(enemigo)
+
+
 
 
 GameOver = False
@@ -127,6 +154,7 @@ while not GameOver:
         
         totalSprites.update()
         balas.update()
+        enemigos.update(jugador.rect.centerx , jugador.rect.centery)
         print(jugador.rect)
         
         jugador.dis_arri()
@@ -137,6 +165,7 @@ while not GameOver:
 
         balas.draw(pantalla)
         totalSprites.draw(pantalla)
+        enemigos.draw(pantalla)
         
 
         pg.display.flip()
