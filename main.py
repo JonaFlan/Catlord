@@ -10,7 +10,7 @@ pg.mixer.init()
 
 class Conexion():
         def __init__(self):
-                self.db = sql.connect(user = "root", passwd = "root", host = "localhost", database = "catlorddb", port = "3306")
+                self.db = sql.connect(user = "remoto", passwd = "remoto", host = "3.213.130.86", database = "catlorddb", port = "3306")
                 self.cursor = self.db.cursor()
                 self.accion = ""
                 self.valor = ""
