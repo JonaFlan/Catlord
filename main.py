@@ -18,6 +18,9 @@ class Jugador(pg.sprite.Sprite):
                 self.vel_y = 5
                 self.cadencia = 750
                 self.ultimo_disparo = pg.time.get_ticks()
+                self.nivelActual = 1
+                self.experienciaActual = 0
+                self.experienciaMaxima = 100
 
         #MOVIMIENTO DEL JUGADOR Y SUS LIMITES
         def update(self):
@@ -48,6 +51,11 @@ class Jugador(pg.sprite.Sprite):
                         self.rect.top = 0
                 if self.rect.bottom > alto:
                         self.rect.bottom = alto
+                #SUBIR DE NIVEL
+                if self.experienciaActual >= self.experienciaMaxima:
+                        self.nivelActual += 1
+                        self.experienciaActual = 0
+                        self.experienciaMaxima += 120
         #DISPAROS DEL JUGADOR
         def dis_arri(self):
                 if estadoTecla[pg.K_UP]:
@@ -55,7 +63,7 @@ class Jugador(pg.sprite.Sprite):
                         if ahora - self.ultimo_disparo > self.cadencia:
                                 bala = Bala(self.rect.centerx, self.rect.centery, vel_y = -10)
                                 totalSprites.add(bala)
-                                balas.add(bala)
+                                balasJugador.add(bala)
                                 self.ultimo_disparo = ahora
         
         def dis_izqu(self):
@@ -64,7 +72,7 @@ class Jugador(pg.sprite.Sprite):
                         if ahora - self.ultimo_disparo > self.cadencia:
                                 bala = Bala(self.rect.centerx, self.rect.centery, vel_x = -10)
                                 totalSprites.add(bala)
-                                balas.add(bala)
+                                balasJugador.add(bala)
                                 self.ultimo_disparo = ahora
         
         def dis_abaj(self):
@@ -73,7 +81,7 @@ class Jugador(pg.sprite.Sprite):
                         if ahora - self.ultimo_disparo > self.cadencia:
                                 bala = Bala(self.rect.centerx, self.rect.centery, vel_y = 10)
                                 totalSprites.add(bala)
-                                balas.add(bala)
+                                balasJugador.add(bala)
                                 self.ultimo_disparo = ahora
         
         def dis_dere(self):
@@ -82,7 +90,7 @@ class Jugador(pg.sprite.Sprite):
                         if ahora - self.ultimo_disparo > self.cadencia:
                                 bala = Bala(self.rect.centerx, self.rect.centery, vel_x = 10)
                                 totalSprites.add(bala)
-                                balas.add(bala)
+                                balasJugador.add(bala)
                                 self.ultimo_disparo = ahora
 
 class Bala(pg.sprite.Sprite):
@@ -95,6 +103,7 @@ class Bala(pg.sprite.Sprite):
                 self.rect.y = y
                 self.vel_x = vel_x
                 self.vel_y = vel_y
+                self.daño = 1
 
         def update(self):
                 self.rect[0] += self.vel_x
@@ -102,16 +111,18 @@ class Bala(pg.sprite.Sprite):
                 if self.rect.bottom < 0 or self.rect.top > alto or self.rect.right < 0 or self.rect.left > ancho:
                         self.kill()
 
-class Enemigo(pg.sprite.Sprite):
+class Enemigo1(pg.sprite.Sprite):
         def __init__(self):
                 #ATRIBUTOS BÁSICOS
                 super().__init__()
                 self.image = pg.image.load("caraJunior.png")
                 self.rect = self.image.get_rect()
-                self.rect.centerx = ancho - self.rect[0]
-                self.rect.centery = alto//2
+                self.rect.centerx = random.randrange(ancho + 40, ancho +150)
+                self.rect.centery = random.randrange(alto)
+                self.vida = 2
                 self.vel_x = 2
-                self.vel_y = 2
+                self.vel_y = 2 
+        
         def update(self, x, y):
                 if x < self.rect.centerx:
                         self.rect[0] -= self.vel_x
@@ -122,24 +133,27 @@ class Enemigo(pg.sprite.Sprite):
                 if y > self.rect.centery:
                         self.rect[1] += self.vel_y
 
+
 #GRUPOS DE SPIRITES
 totalSprites = pg.sprite.Group()
 enemigos = pg.sprite.Group()
-balas = pg.sprite.Group()
+balasJugador = pg.sprite.Group()
 
 #CONFIGURACIÓN BÁSICA DE LA VENTANA
 clock = pg.time.Clock()
+pg.display.set_caption("Catlord 0.03")
 tamañoVentana = ancho, alto = 1920, 1080
 pantalla = pg.display.set_mode(tamañoVentana)
 negro = 0,0,0
 blanco = 255,255,255
 
 jugador = Jugador()
-enemigo = Enemigo()
 totalSprites.add(jugador)
-enemigos.add(enemigo)
 
 
+for x in range(20):
+        enemigo = Enemigo1()
+        enemigos.add(enemigo)
 
 
 GameOver = False
@@ -153,17 +167,27 @@ while not GameOver:
         pantalla.fill(blanco)
         
         totalSprites.update()
-        balas.update()
+        balasJugador.update()
         enemigos.update(jugador.rect.centerx , jugador.rect.centery)
-        print(jugador.rect)
         
+        print(jugador.experienciaActual)
+        print(jugador.nivelActual)
+        
+        colisionBalaYEnemigo = pg.sprite.groupcollide(balasJugador, enemigos, True, True)
+        if colisionBalaYEnemigo:
+                jugador.experienciaActual += 10
+        colisionEnemigoYEnemigo = pg.sprite.groupcollide(enemigos, enemigos, False, False)
+        if colisionEnemigoYEnemigo:
+                for x in enemigos:
+                        x.rect.bottom = x.rect.bottom
+
         jugador.dis_arri()
         jugador.dis_izqu()
         jugador.dis_abaj()
         jugador.dis_dere()
         
 
-        balas.draw(pantalla)
+        balasJugador.draw(pantalla)
         totalSprites.draw(pantalla)
         enemigos.draw(pantalla)
         
