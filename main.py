@@ -323,7 +323,6 @@ class Parry(pg.sprite.Sprite):
         def __init__(self,x, y, lanzamiento):
                 super().__init__()
                 self.escudo = pg.image.load("escudo.png")
-                self.escudo2 = pg.image.load("escudo2.png")
                 self.image = self.escudo
                 self.rect = self.image.get_rect()
                 self.rect.centerx = x
