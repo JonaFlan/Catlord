@@ -123,8 +123,8 @@ class Principal():
                 self.balasJugadorSprites = pg.sprite.Group()
 
                 #CONFIGURACIÓN BÁSICA DE LA VENTANA
-                self.clock = pg.time.Clock()
                 pg.display.set_caption("Catlord 0.2")
+                self.clock = pg.time.Clock()    
                 self.tamañoVentana = self.ancho, self.alto = 1920, 1080
                 self.pantalla = pg.display.set_mode(self.tamañoVentana)
                 self.fondo = pg.image.load("cielo.png").convert()
@@ -133,10 +133,9 @@ class Principal():
                 self.tiempoRespawn = 1500
                 self.ultimoRespawn = pg.time.get_ticks()
 
-                
+                self.gameOver = False           
 
         def bucleJuego(self):
-                self.gameOver = False
                 while not self.gameOver:
                         for event in pg.event.get():
                                 if event.type == pg.QUIT:
@@ -182,7 +181,6 @@ class Principal():
         
 class Jugador(pg.sprite.Sprite):
         def __init__(self):
-                #ATRIBUTOS BÁSICOS
                 super().__init__()
                 #SPRITES DEL JUGADOR
                 self.willyBase = pg.image.load("willyCachorro.png")
@@ -190,6 +188,7 @@ class Jugador(pg.sprite.Sprite):
                 self.willyBase2 = pg.image.load("caraWilly.png")
                 self.willyRugido2 = pg.image.load("willyRugido.png")
                 
+                #ATRIBUTOS
                 self.image = self.willyBase
                 self.rect = self.image.get_rect()
                 self.rect.centerx = principal.ancho//2
@@ -313,7 +312,6 @@ class Bala(pg.sprite.Sprite):
                 self.rect.y = y
                 self.vel_x = vel_x
                 self.vel_y = vel_y
-                self.daño = 1
 
         def update(self):
                 self.rect[0] += self.vel_x
@@ -330,7 +328,6 @@ class Parry(pg.sprite.Sprite):
                 self.rect = self.image.get_rect()
                 self.rect.centerx = x
                 self.rect.centery = y
-                self.daño = 1
                 self.lanzamiento = lanzamiento
                 self.duracion = 100
 
@@ -373,7 +370,6 @@ class Enemigo1(pg.sprite.Sprite):
                         self.rect.centery = random.randrange(principal.alto)
                         self.vel_x = -5
                         self.vel_y = 0
-                self.vida = 2
         
         def update(self):
                 self.rect[0] += self.vel_x
